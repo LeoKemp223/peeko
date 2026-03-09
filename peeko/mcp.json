@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "peeko": {
+      "command": "python",
+      "args": ["-m", "peeko.mcp_server"],
+      "cwd": "G:/ai/ramgs/peeko"
+    }
+  }
+}

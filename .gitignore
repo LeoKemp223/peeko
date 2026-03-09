@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.spec
+*.exe
+
+# IDE
+.cursor/
+
+# Symbols & ELF (user-generated, large binary)
+*.elf
+*.json
+!mcp.json
+
+# OS
+Thumbs.db
+.DS_Store
