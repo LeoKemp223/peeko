@@ -1,27 +1,23 @@
-# 工作流名称，会显示在 GitHub Actions 页面
 name: AI Code Review
 
-# 触发条件
 on:
   pull_request:
     types: [opened, synchronize]
 
-# 定义执行任务
 jobs:
   review:
     runs-on: ubuntu-latest
 
     permissions:
       pull-requests: write
+      issues: write
       contents: read
-      
-    # 执行步骤
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
       - run: node scripts/review.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
