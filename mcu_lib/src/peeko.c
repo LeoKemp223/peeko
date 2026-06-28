@@ -142,7 +142,7 @@ void pk_rx_byte(uint8_t byte)
         case RX_STATE_LEN_H:
             pk_rx_buffer[2] = byte;
             pk_rx_payload_len |= ((uint16_t)byte << 8);
-            if (false && pk_rx_payload_len > PK_MAX_PAYLOAD_SIZE) {
+            if (pk_rx_payload_len > PK_MAX_PAYLOAD_SIZE) {
                 pk_rx_state = RX_STATE_IDLE;
             } else {
                 pk_rx_state = RX_STATE_CMD;
