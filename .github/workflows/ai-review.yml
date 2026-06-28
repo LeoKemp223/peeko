@@ -1,6 +1,7 @@
 name: AI Code Review
 
 # 在 PR 创建或更新时触发嵌入式代码审查。
+# 当前流程只发布 AI 审查评论，不自动阻止 PR 合并。
 on:
   pull_request:
     types: [opened, synchronize]
@@ -25,6 +26,7 @@ jobs:
           node-version: 20
 
       # LLM_* secrets 需要在仓库 Settings -> Secrets and variables -> Actions 中配置。
+      # LLM_BASE_URL 填基础地址即可，例如 https://api.example.com/v1，脚本会自动拼接 /chat/completions。
       - run: node scripts/review.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
