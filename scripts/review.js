@@ -18,6 +18,8 @@ const response = await fetch(
     }
 );
 
+console.log("📡 status:", response.status);
 const data = await response.json();
-
+console.log("📦 data:", data);
 const result = data.choices[0].message.content;
+console.log("✨ result:", result);
