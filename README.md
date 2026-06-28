@@ -1,5 +1,7 @@
 # Peeko
+ 
 
+AI review workflow test.
 **让 AI 真正理解硬件 —— 串口桥接 PC 与 MCU，实时读写 RAM 变量**
 
 [English](README_EN.md)
