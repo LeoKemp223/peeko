@@ -27,19 +27,9 @@ jobs:
 
       # LLM_* secrets 需要在仓库 Settings -> Secrets and variables -> Actions 中配置。
       # LLM_BASE_URL 填基础地址即可，例如 https://api.example.com/v1，脚本会自动拼接 /chat/completions。
-      # REVIEW_* 是必填配置，用于告诉脚本当前嵌入式项目的名称、描述和 GitHub API 客户端标识。
       - run: node scripts/review.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
           LLM_MODEL: ${{ secrets.LLM_MODEL }}
-
-          # 项目名称：会写入 AI 提示词，帮助模型理解正在审查哪个仓库。
-          REVIEW_PROJECT_NAME: "peeko"
-
-          # 项目简介：会写入 AI 提示词，复用到其他嵌入式项目时改成该项目的一句话描述。
-          REVIEW_PROJECT_DESCRIPTION: "一个面向嵌入式开发的工具链项目"
-
-          # GitHub API 客户端标识：仅用于请求头，建议改成“项目名-ai-review”。
-          REVIEW_USER_AGENT: "peeko-ai-review"

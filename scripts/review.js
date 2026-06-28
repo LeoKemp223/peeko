@@ -7,34 +7,26 @@ const REQUIRED_ENV = [
     "LLM_API_KEY",
     "LLM_BASE_URL",
     "LLM_MODEL",
-    "REVIEW_PROJECT_NAME",
-    "REVIEW_PROJECT_DESCRIPTION",
-    "REVIEW_USER_AGENT",
 ];
 
 const MAX_DIFF_CHARS = 60000;
 const MAX_PR_FILE_PAGES = 30;
-
-// 复用到其他嵌入式项目时，只需要在 workflow 中修改这些 REVIEW_* 环境变量。
-const CONFIG = {
-    projectName: process.env.REVIEW_PROJECT_NAME,
-    projectDescription: process.env.REVIEW_PROJECT_DESCRIPTION,
-    userAgent: process.env.REVIEW_USER_AGENT,
-};
+const USER_AGENT = "embedded-ai-review";
 
 // 嵌入式项目专用审查规则；这些内容会随 PR diff 一起发给 LLM。
 function buildReviewRules() {
     return [
-        `你正在审查 ${CONFIG.projectName} 仓库的 GitHub Pull Request。${CONFIG.projectName} 是${CONFIG.projectDescription}。`,
-        "请以资深嵌入式固件工程师和 MCU 工具链工程师的视角进行代码审查。",
+        "请以资深嵌入式固件工程师的视角进行代码审查，并关注构建、链接、烧录和调试工具链相关风险。",
         "重点关注嵌入式开发中真正重要的问题：",
-        "- MCU RAM/Flash 布局假设、链接脚本/map/ELF 解析风险，以及符号解析正确性。",
-        "- 串口协议正确性、帧格式、超时处理、半包/粘包、读写重试，以及主机与设备状态同步。",
-        "- C 固件安全性：缓冲区边界、整数宽度和有符号问题、内存对齐、端序假设、volatile/共享状态、ISR 安全性和可重入性。",
-        "- Python 上位机工具可靠性：二进制解析、串口资源释放、跨平台行为、CLI 错误处理，以及依赖和运行时兼容性。",
-        "- 实时性和硬件风险：阻塞调用、时序假设、watchdog 影响、电源/复位行为，以及必须上板验证的行为。",
-        "- 构建和发布风险：打包、生成产物、工具链假设、缺失测试，以及可能误导嵌入式用户的文档。",
-        "不要编造 diff 中没有出现的开发板型号、MCU 类型、寄存器映射、引脚定义、串口参数或硬件行为。",
+        "- 内存安全：缓冲区边界、整数宽度和有符号问题、内存对齐、端序假设、栈/堆使用，以及 DMA 缓冲区一致性。",
+        "- 并发与时序：volatile/共享状态、ISR 安全性、可重入性、临界区、RTOS 任务同步、阻塞调用、超时和实时性。",
+        "- 外设与硬件接口：GPIO/I2C/SPI/UART/CAN/ADC/PWM/DMA 配置、初始化顺序、错误恢复，以及硬件状态同步。",
+        "- 通信协议：帧格式、长度校验、CRC/checksum、半包/粘包、重试、超时、兼容性和异常输入处理。",
+        "- 存储与启动：Flash/RAM 布局、链接脚本、启动流程、Bootloader、掉电保护、Flash 擦写寿命和参数持久化。",
+        "- 构建和工具链：编译选项、链接产物、map/ELF/符号解析、生成代码保护区、跨平台脚本和发布产物。",
+        "- 上位机或测试工具：如果 PR 涉及 Python/CLI/串口工具，关注二进制解析、资源释放、跨平台行为和错误提示。",
+        "- 硬件验证风险：指出哪些行为必须上板验证，哪些结论不能只靠代码 diff 判断。",
+        "不要编造 diff 中没有出现的开发板型号、MCU 类型、寄存器映射、引脚定义、通信参数或硬件行为。",
         "如果某个问题依赖未知硬件细节，请明确说明你的假设，并指出需要补充哪些证据。",
         "请保持简洁。如果没有发现有意义的嵌入式开发问题，请明确说明。",
         "尽量给出可执行的建议，并在可能时标注文件路径和行号。",
@@ -62,7 +54,7 @@ function githubHeaders() {
     return {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-        "User-Agent": CONFIG.userAgent,
+        "User-Agent": USER_AGENT,
         "X-GitHub-Api-Version": "2022-11-28",
     };
 }
@@ -171,7 +163,7 @@ async function callLlm(prompt) {
             messages: [
                 {
                     role: "system",
-                    content: "你是一名严谨的资深嵌入式固件工程师和 MCU 工具链工程师，正在进行 Pull Request 代码审查。最终审查结果必须使用中文输出。",
+                    content: "你是一名严谨的资深嵌入式固件工程师，正在进行 Pull Request 代码审查。最终审查结果必须使用中文输出。",
                 },
                 {
                     role: "user",
