@@ -49,11 +49,17 @@ extern "C" {
 
 /**
  * @brief Maximum payload size in bytes
- * Adjust based on available RAM. Default: 256 bytes
+ * Adjust based on available RAM. Default: 256 bytes.
+ * Keep this small for MCU RAM/stack safety; applications may use this macro
+ * for local buffers in addition to the static buffers used by the library.
  * Minimum recommended: 64 bytes
  */
 #ifndef PK_MAX_PAYLOAD_SIZE
-#define PK_MAX_PAYLOAD_SIZE     65535
+#define PK_MAX_PAYLOAD_SIZE     256
+#endif
+
+#if PK_MAX_PAYLOAD_SIZE > 1024
+#error "PK_MAX_PAYLOAD_SIZE is too large for typical MCU RAM/stack usage"
 #endif
 
 /**
