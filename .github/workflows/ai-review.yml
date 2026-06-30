@@ -1,0 +1,34 @@
+name: AI Code Review
+
+# 在 PR 创建或更新时触发嵌入式代码审查。
+# 当前流程只发布 AI 审查评论，不自动阻止 PR 合并。
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    # 脚本需要读取代码、读取 PR 信息，并以 issue comment 的形式发布审查结果。
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+
+    steps:
+      # 拉取当前 PR 对应的仓库内容，供审查脚本读取。
+      - uses: actions/checkout@v4
+
+      # review.js 只依赖 Node.js 20 内置能力，不需要 npm install。
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # LLM_* secrets 需要在仓库 Settings -> Secrets and variables -> Actions 中配置。
+      - run: node scripts/review.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
