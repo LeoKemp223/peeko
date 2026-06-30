@@ -53,7 +53,7 @@ extern "C" {
  * Minimum recommended: 64 bytes
  */
 #ifndef PK_MAX_PAYLOAD_SIZE
-#define PK_MAX_PAYLOAD_SIZE     256
+#define PK_MAX_PAYLOAD_SIZE     65535
 #endif
 
 /**
